@@ -1,0 +1,230 @@
+﻿@model EmbedWidgetModel
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="form-horizontal">
+            <div class="cards-group">
+                <div class="card card-default">
+                    <div class="card-body">
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <nop-label asp-for="Active" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-editor asp-for="Active" />
+                                <span asp-validation-for="Active"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <nop-label asp-for="ChannelId" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-select asp-for="ChannelId" asp-items="@Model.AvailableChannels" asp-required="true" />
+                                <span asp-validation-for="ChannelId"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row" id="pnlPlaylist">
+                            <div class="col-md-3">
+                                <nop-label asp-for="PlaylistId" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-select asp-for="PlaylistId" asp-items="@Model.AvailablePlaylists" />
+                                <span asp-validation-for="PlaylistId"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row" id="pnlVideo">
+                            <div class="col-md-3">
+                                <nop-label asp-for="VideoId" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-select asp-for="VideoId" asp-items="@Model.AvailableVideos" />
+                                <span asp-validation-for="VideoId"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <nop-label asp-for="LayoutTypeId" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-select asp-for="LayoutTypeId" asp-items="@Model.AvailableLayoutTypes" />
+                                <span asp-validation-for="LayoutTypeId"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <nop-label asp-for="WidgetZoneId" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-select asp-for="WidgetZoneId" asp-items="@Model.AvailableWidgetZones" />
+                                <span asp-validation-for="WidgetZoneId"></span>
+                            </div>
+                        </div>
+                        @(await Html.LocalizedEditorAsync<EmbedWidgetModel, EmbedWidgetLocalizedModel>("embedwidget-localized",
+                            @<div>
+                                <div class="form-group row">
+                                    <div class="col-md-3">
+                                        <nop-label asp-for="@Model.Locales[item].Title" />
+                                    </div>
+                                    <div class="col-md-9">
+                                        <nop-editor asp-for="@Model.Locales[item].Title" />
+                                        <span asp-validation-for="@Model.Locales[item].Title"></span>
+                                    </div>
+                                </div>
+                                <input type="hidden" asp-for="@Model.Locales[item].LanguageId" />
+                            </div>
+                            , @<div>
+                                <div class="form-group row">
+                                    <div class="col-md-3">
+                                        <nop-label asp-for="Title" />
+                                    </div>
+                                    <div class="col-md-9">
+                                        <nop-editor asp-for="Title" />
+                                        <span asp-validation-for="Title"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            ))
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <nop-label asp-for="DisplayOrder" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-editor asp-for="DisplayOrder" />
+                                <span asp-validation-for="DisplayOrder"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <nop-label asp-for="SelectedStoreIds" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-select asp-for="SelectedStoreIds" asp-items="@Model.AvailableStores" asp-multiple="true" />
+                                <span asp-validation-for="SelectedStoreIds"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <nop-label asp-for="Loop" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-editor asp-for="Loop" />
+                                <span asp-validation-for="Loop"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <nop-label asp-for="AutoPlay" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-editor asp-for="AutoPlay" />
+                                <span asp-validation-for="AutoPlay"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <nop-label asp-for="MaxVideos" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-editor asp-for="MaxVideos" />
+                                <span asp-validation-for="MaxVideos"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <nop-label asp-for="Placement" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-editor asp-for="Placement" />
+                                <span asp-validation-for="Placement"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <nop-label asp-for="PlayerPlacement" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-select asp-for="PlayerPlacement" asp-items="@Model.AvailablePlayerPlacements" />
+                                <span asp-validation-for="PlayerPlacement"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    $(document).ready(function () {
+        $('#@Html.IdFor(model => model.ChannelId)').change(channelChangeHandler);
+        $('#@Html.IdFor(model => model.PlaylistId)').change(playlistChangeHandler);
+
+        var channelId = $('#@Html.IdFor(model => model.ChannelId)').val();
+        if (!channelId) {
+            $('#pnlPlaylist').hide();
+            $('#pnlVideo').hide();
+            channelChangeHandler();
+        }
+        var playlistId = $('#@Html.IdFor(model => model.PlaylistId)').val();
+        if (!playlistId) {
+            $('#pnlVideo').hide();
+            playlistChangeHandler();
+        }
+    });
+
+    function channelChangeHandler() {
+        var channelId = $('#@Html.IdFor(model => model.ChannelId)').val();
+        if (channelId) {
+            $.ajax({
+                url: '@Url.Action("Playlists", "Firework")',
+                data: { channelId: channelId },
+                success: function (data) {
+                    var list = $('#@Html.IdFor(model => model.PlaylistId)');
+                    list.html('');
+                    $.each(data, function (id, option) {
+                        list.append($('<option></option>').val(option.Id).html(option.Name + '(' + option.Id + ')'));
+                    });
+                    $('#pnlPlaylist').show();
+                    playlistChangeHandler();
+                },
+                error: function (xhr, status, error) {
+                    $('#pnlPlaylist').hide();
+                    $('#pnlVideo').hide();
+                }
+            });
+        }
+        else {
+            $('#pnlPlaylist').hide();
+            $('#pnlVideo').hide();
+        }
+    }
+
+    function playlistChangeHandler() {
+        var channelId = $('#@Html.IdFor(model => model.ChannelId)').val();
+        var playlistId = $('#@Html.IdFor(model => model.PlaylistId)').val();
+        if (channelId && playlistId) {
+            $.ajax({
+                url: '@Url.Action("Videos", "Firework")',
+                data: {
+                    channelId: channelId,
+                    playlistId: playlistId
+                },
+                success: function (data) {
+                    var list = $('#@Html.IdFor(model => model.VideoId)');
+                    list.html('');
+                    $.each(data, function (id, option) {
+                        list.append($('<option></option>').val(option.EncodedId).html(option.Caption + '(' + option.EncodedId + ')'));
+                    });
+                    $('#pnlVideo').show();
+                },
+                error: function (xhr, status, error) {
+                    $('#pnlVideo').hide();
+                }
+            });
+        }
+        else {
+            $('#pnlPlaylist').hide();
+        }
+    }
+</script>

@@ -1,0 +1,96 @@
+﻿@model IList<EmbedWidgetModel>
+
+@{
+    var currency = await workContext.GetWorkingCurrencyAsync();
+
+    var cdnUrl = $"//{FireworkDefaults.CdnUrl}/js/fwn.js";
+    if (Model.Count == 1 && Model.FirstOrDefault() is EmbedWidgetModel singleWidget)
+    {
+        switch ((LayoutType?)singleWidget.LayoutTypeId)
+        {
+            case LayoutType.Storyblock:
+            case LayoutType.FloatingPlayer:
+                cdnUrl = $"//{FireworkDefaults.CdnUrl}/js/storyblock.js";
+                break;
+            case LayoutType.ChannelButton:
+                cdnUrl = $"//{FireworkDefaults.CdnUrl}/js/channel-button.js";
+                break;
+            case LayoutType.Grid:
+            case LayoutType.Carousel:
+                cdnUrl = $"//{FireworkDefaults.CdnUrl}/js/embed-feed.js";
+                break;
+            case LayoutType.HeroUnit:
+                break;
+        }      
+    }
+    NopHtml.AddScriptParts(ResourceLocation.Head, cdnUrl, excludeFromBundle: true, isAsync: true);
+    NopHtml.AddScriptParts(ResourceLocation.Head, "~/Plugins/Widgets.Firework/Content/js/firework.public.js", excludeFromBundle: true);
+}
+
+@foreach (var widget in Model)
+{
+    switch ((LayoutType?)widget.LayoutTypeId)
+    {
+        case LayoutType.Storyblock:
+        case LayoutType.FloatingPlayer:
+            <fw-storyblock 
+                channel="@widget.ChannelId"
+                playlist="@widget.PlaylistId"
+                video="@widget.VideoId"
+                mode="@(widget.LayoutTypeId == (int)LayoutType.FloatingPlayer ? "pinned" : "row")"
+                autoplay="@widget.AutoPlay.ToString().ToLower()"
+                max_videos="@widget.MaxVideos"
+                loop="@widget.Loop.ToString().ToLower()"
+                dock="false">
+            </fw-storyblock>
+            break;
+            
+        case LayoutType.ChannelButton:
+            <fw-channel-button
+                channel="@widget.ChannelId"
+                playlist="@widget.PlaylistId"
+                video="@widget.VideoId"
+                placement="@widget.PlayerPlacement"
+                text="@widget.Title"
+                open_in="_blank"
+                collapsed="false"
+                horizontal=""
+                vertical="">
+            </fw-channel-button>
+            break;
+
+        case LayoutType.Grid:
+        case LayoutType.Carousel:
+            <fw-embed-feed
+                channel="@widget.ChannelId"
+                playlist="@widget.PlaylistId"
+                video="@widget.VideoId"
+                mode="@(widget.LayoutTypeId == (int)LayoutType.Grid ? "grid" : "row")"
+                size="large"
+                open_in="default"
+                max_videos="@widget.MaxVideos"
+                autoplay="@widget.AutoPlay.ToString().ToLower()"
+                placement="middle"
+                player_placement="@widget.PlayerPlacement"
+                title="@widget.Title">
+            </fw-embed-feed>
+            break;
+
+        case LayoutType.HeroUnit:
+            <fw-herounit 
+                channel="@widget.ChannelId"
+                playlist="@widget.PlaylistId"
+                video="@widget.VideoId"
+                hero_text_mode="even"
+                hero_flip_order="false">
+            </fw-herounit>
+            break;
+    }
+}
+
+@if (Model.Any())
+{
+    <script asp-location="Footer">
+        FW.init('@Url.RouteUrl("ShoppingCart")', '@currency.CurrencyCode');
+    </script>
+}

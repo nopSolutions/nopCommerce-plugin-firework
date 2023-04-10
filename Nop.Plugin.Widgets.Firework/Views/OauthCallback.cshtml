@@ -1,0 +1,20 @@
+﻿@{
+    Layout = "_AdminPopupLayout";
+}
+
+@if (ViewBag.RefreshPage == true)
+{
+    <script>
+        try {
+            window.opener.location.reload(); 
+        }
+        catch (e) {
+            console.log(e);
+        }
+        window.close();
+    </script>
+}
+else
+{
+    <h6>@ViewBag.Error</h6>
+}

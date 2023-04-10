@@ -1,0 +1,182 @@
+﻿@model ConfigurationModel
+
+@{
+    Layout = "_AdminLayout";
+    ViewBag.PageTitle = T("Plugins.Widgets.Firework").Text;
+    NopHtml.SetActiveMenuItemSystemName("Plugins.Widgets.Firework.Menu.Configure");
+}
+
+<form asp-controller="Firework" asp-action="Configure" method="post" id="configuration-form">
+    <div class="content-header clearfix">
+        <h1 class="float-left">
+            @T("Plugins.Widgets.Firework.Configuration")
+        </h1>
+        <div class="float-right">
+        </div>
+    </div>
+    <section class="content">
+        <div class="container-fluid">
+            <div class="form-horizontal">
+                    <div class="cards-group">
+                        <div class="card card-default">
+                            <div class="card-header">
+                                @T("Plugins.Widgets.Firework.OAuth")
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <div class="col-md-3">
+                                        <nop-label asp-for="Email" />
+                                    </div>
+                                    <div class="col-md-9">
+                                        @if (Model.Configured)
+                                        {
+                                            <div class="form-text-row">@Model.Email</div>
+                                            <input asp-for="Email" type="hidden" />
+                                        }
+                                        else
+                                        {
+                                            <nop-editor asp-for="Email" />
+                                        }
+                                        <span asp-validation-for="Email"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-3">
+                                        <nop-label asp-for="Connected" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-text-row">@T($"Plugins.Widgets.Firework.OAuth.{(Model.Connected ? "Connected" : "Disconnected")}")</div>
+                                    </div>
+                                </div>
+                                @if (Model.Configured)
+                                {
+                                    <div class="form-group row">
+                                        <div class="col-md-3">
+                                            <nop-label asp-for="ClientId" />
+                                        </div>
+                                        <div class="col-md-9">
+                                            <div class="form-text-row">@Model.ClientId</div>
+                                            <input asp-for="ClientId" type="hidden" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-md-3">
+                                            <nop-label asp-for="ClientSecret" />
+                                        </div>
+                                        <div class="col-md-9">
+                                            <div class="form-text-row">@(new string('*', Model.ClientSecret?.Count() ?? 0))</div>
+                                            <input asp-for="ClientSecret" type="hidden" />
+                                        </div>
+                                    </div>
+                                    @if (Model.Connected)
+                                    {
+                                        <div class="form-group row">
+                                            <div class="col-md-3">
+                                                <nop-label asp-for="BusinessId" />
+                                            </div>
+                                            <div class="col-md-9">
+                                                <div class="form-text-row">@Model.BusinessId</div>
+                                                <input asp-for="BusinessId" type="hidden" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-md-3">
+                                                <nop-label asp-for="BusinessStoreId" />
+                                            </div>
+                                            <div class="col-md-9">
+                                                <nop-select asp-for="BusinessStoreId" asp-items="@Model.AvailableBusinessStores" />
+                                                <span asp-validation-for="BusinessStoreId"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-md-9 offset-md-3">
+                                                <button type="submit" name="reset-credentials" class="btn btn-danger">@T("Plugins.Widgets.Firework.OAuth.ButtonReset")</button>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="form-group row">
+                                            <div class="col-md-9 offset-md-3">
+                                            <button type="submit" id="btnConnectFirework" onclick="javascript:OpenWindow('@(Url.Action("ConnectAccount", "Firework"))', 800, 800, true); this.disabled=true; return false;" class="btn btn-primary">
+                                                    @T("Plugins.Widgets.Firework.OAuth.Button")
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                @if (!Model.Connected)
+                                {
+                                    <div class="form-group row">
+                                        <div class="col-md-9 offset-md-3">
+                                            <button type="submit" name="credentials" class="btn bg-olive">@T("Admin.Common.Save")</button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        @if (Model.Connected)
+                        {
+                            <div class="card card-default">
+                                <div class="card-header">
+                                    @T("Plugins.Widgets.Firework.EmbedWidget")
+                                </div>
+                                <div class="card-body">
+                                    @await Html.PartialAsync("Table", new DataTablesModel
+                                    {
+                                        Name = "embedwidget-grid",
+                                        UrlRead = new DataUrl("ListEmbedWidget", "Firework"),
+                                        Length = Model.EmbedWidgetSearchModel.PageSize,
+                                        LengthMenu = Model.EmbedWidgetSearchModel.AvailablePageSizes,
+                                        UrlDelete = new DataUrl("DeleteEmbedWidget", "Firework"),
+                                        ColumnCollection = new List<ColumnProperty>
+                                        {
+                                            new ColumnProperty(nameof(EmbedWidgetModel.Title))
+                                            {
+                                                Title = T("Plugins.Widgets.Firework.EmbedWidget.Fields.Title").Text
+                                            },
+                                            new ColumnProperty(nameof(EmbedWidgetModel.WidgetZoneValue))
+                                            {
+                                                Title = T("Plugins.Widgets.Firework.EmbedWidget.Fields.WidgetZone").Text,
+                                                Width = "150"
+                                            },
+                                            new ColumnProperty(nameof(EmbedWidgetModel.Active))
+                                            {
+                                                Title = T("Plugins.Widgets.Firework.EmbedWidget.Fields.Active").Text,
+                                                Width = "80",
+                                                ClassName = NopColumnClassDefaults.CenterAll,
+                                                Render = new RenderBoolean()
+                                            },
+                                            new ColumnProperty(nameof(EmbedWidgetModel.DisplayOrder))
+                                            {
+                                                Title = T("Plugins.Widgets.Firework.EmbedWidget.Fields.DisplayOrder").Text,
+                                                Width = "120",
+                                                ClassName = NopColumnClassDefaults.CenterAll
+                                            },
+                                            new ColumnProperty(nameof(EmbedWidgetModel.Id))
+                                            {
+                                                Title = T("Admin.Common.Edit").Text,
+                                                Width = "100",
+                                                ClassName =  NopColumnClassDefaults.Button,
+                                                Render = new RenderButtonEdit(new DataUrl("EditEmbedWidget", "Firework"))
+                                            },
+                                            new ColumnProperty(nameof(EmbedWidgetModel.Id))
+                                            {
+                                                Title = T("Admin.Common.Delete").Text,
+                                                Width = "100",
+                                                ClassName =  NopColumnClassDefaults.Button,
+                                                Render = new RenderButtonRemove(T("Admin.Common.Delete").Text)
+                                            }
+                                        }
+                                    })
+                                </div>
+                                <div class="card-footer">
+                                    <a role="button" id="add-embedwidget" class="btn btn-primary" asp-action="CreateEmbedWidget">@T("Plugins.Widgets.Firework.EmbedWidget.AddNew")</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+            </div>
+        </div>
+    </section>
+</form>
