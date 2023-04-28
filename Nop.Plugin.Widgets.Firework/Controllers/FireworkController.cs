@@ -261,6 +261,7 @@ namespace Nop.Plugin.Widgets.Firework.Controllers
         {
             var model = await _fireworkModelFactory.PrepareEmbedWidgetModelAsync(new(), null);
             model.Active = true;
+
             return View("~/Plugins/Widgets.Firework/Views/CreateEmbedWidget.cshtml", model);
         }
 
@@ -273,16 +274,16 @@ namespace Nop.Plugin.Widgets.Firework.Controllers
                 var embedWidget = new FireworkEmbedWidget
                 {
                     Active = model.Active,
-                    Title = model.Title,
                     ChannelId = model.ChannelId,
                     PlaylistId = model.PlaylistId,
                     VideoId = model.VideoId,
                     WidgetZoneId = model.WidgetZoneId,
-                    AutoPlay = model.AutoPlay,
-                    DisplayOrder = model.DisplayOrder,
                     LayoutTypeId = model.LayoutTypeId,
+                    Title = model.Title,
+                    DisplayOrder = model.DisplayOrder,
                     LimitedToStores = model.SelectedStoreIds.Any(),
                     Loop = model.Loop,
+                    AutoPlay = model.AutoPlay,
                     MaxVideos = model.MaxVideos,
                     Placement = model.Placement,
                     PlayerPlacement = model.PlayerPlacement,
@@ -305,7 +306,6 @@ namespace Nop.Plugin.Widgets.Firework.Controllers
         public async Task<IActionResult> EditEmbedWidget(int id)
         {
             var embedWidget = await _fireworkWidgetService.GetEmbedWidgetByIdAsync(id);
-
             if (embedWidget is null)
                 return RedirectToAction(nameof(Configure));
 
@@ -319,26 +319,25 @@ namespace Nop.Plugin.Widgets.Firework.Controllers
         public async Task<IActionResult> EditEmbedWidget(EmbedWidgetModel model, bool continueEditing)
         {
             var embedWidget = await _fireworkWidgetService.GetEmbedWidgetByIdAsync(model.Id);
-
             if (embedWidget is null)
                 return RedirectToAction(nameof(Configure));
 
             if (ModelState.IsValid)
             {
                 embedWidget.Active = model.Active;
-                embedWidget.Title = model.Title;
                 embedWidget.ChannelId = model.ChannelId;
                 embedWidget.PlaylistId = model.PlaylistId;
                 embedWidget.VideoId = model.VideoId;
-                embedWidget.AutoPlay = model.AutoPlay;
-                embedWidget.DisplayOrder = model.DisplayOrder;
+                embedWidget.WidgetZoneId = model.WidgetZoneId;
                 embedWidget.LayoutTypeId = model.LayoutTypeId;
+                embedWidget.Title = model.Title;
+                embedWidget.DisplayOrder = model.DisplayOrder;
                 embedWidget.LimitedToStores = model.SelectedStoreIds.Any();
                 embedWidget.Loop = model.Loop;
+                embedWidget.AutoPlay = model.AutoPlay;
                 embedWidget.MaxVideos = model.MaxVideos;
                 embedWidget.Placement = model.Placement;
                 embedWidget.PlayerPlacement = model.PlayerPlacement;
-                embedWidget.WidgetZoneId = model.WidgetZoneId;
 
                 await _fireworkWidgetService.UpdateEmbedWidgetAsync(embedWidget);
 
@@ -358,7 +357,6 @@ namespace Nop.Plugin.Widgets.Firework.Controllers
         public async Task<IActionResult> DeleteEmbedWidget(int id)
         {
             var embedWidget = await _fireworkWidgetService.GetEmbedWidgetByIdAsync(id);
-
             if (embedWidget is null)
                 return RedirectToAction(nameof(Configure));
 

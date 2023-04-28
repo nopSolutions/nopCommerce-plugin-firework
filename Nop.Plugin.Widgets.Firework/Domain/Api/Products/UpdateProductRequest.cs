@@ -36,6 +36,7 @@ namespace Nop.Plugin.Widgets.Firework.Domain.Api.Products
         {
             return new UpdateProductRequest
             {
+                BusinessId = fireworkProduct.BusinessId,
                 BusinessStoreId = fireworkProduct.BusinessStoreId,
                 BusinessStoreName = fireworkProduct.BusinessStoreName,
                 BusinessStoreUid = fireworkProduct.BusinessStoreUid,

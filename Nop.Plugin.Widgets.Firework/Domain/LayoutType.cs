@@ -18,7 +18,7 @@
         /// <summary>
         /// Channel Button allows you to integrate the video feed in a circular
         /// </summary>
-        ChannelButton,
+        //ChannelButton, //deprecated
 
         /// <summary>
         /// Embed feed allows the content to be displayed as a row (carousel) or grid of thumbnails

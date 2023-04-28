@@ -44,6 +44,15 @@
                         </div>
                         <div class="form-group row">
                             <div class="col-md-3">
+                                <nop-label asp-for="WidgetZoneId" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-select asp-for="WidgetZoneId" asp-items="@Model.AvailableWidgetZones" />
+                                <span asp-validation-for="WidgetZoneId"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-3">
                                 <nop-label asp-for="LayoutTypeId" />
                             </div>
                             <div class="col-md-9">
@@ -53,38 +62,13 @@
                         </div>
                         <div class="form-group row">
                             <div class="col-md-3">
-                                <nop-label asp-for="WidgetZoneId" />
+                                <nop-label asp-for="Title" />
                             </div>
                             <div class="col-md-9">
-                                <nop-select asp-for="WidgetZoneId" asp-items="@Model.AvailableWidgetZones" />
-                                <span asp-validation-for="WidgetZoneId"></span>
+                                <nop-editor asp-for="Title" />
+                                <span asp-validation-for="Title"></span>
                             </div>
                         </div>
-                        @(await Html.LocalizedEditorAsync<EmbedWidgetModel, EmbedWidgetLocalizedModel>("embedwidget-localized",
-                            @<div>
-                                <div class="form-group row">
-                                    <div class="col-md-3">
-                                        <nop-label asp-for="@Model.Locales[item].Title" />
-                                    </div>
-                                    <div class="col-md-9">
-                                        <nop-editor asp-for="@Model.Locales[item].Title" />
-                                        <span asp-validation-for="@Model.Locales[item].Title"></span>
-                                    </div>
-                                </div>
-                                <input type="hidden" asp-for="@Model.Locales[item].LanguageId" />
-                            </div>
-                            , @<div>
-                                <div class="form-group row">
-                                    <div class="col-md-3">
-                                        <nop-label asp-for="Title" />
-                                    </div>
-                                    <div class="col-md-9">
-                                        <nop-editor asp-for="Title" />
-                                        <span asp-validation-for="Title"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            ))
                         <div class="form-group row">
                             <div class="col-md-3">
                                 <nop-label asp-for="DisplayOrder" />
@@ -99,11 +83,38 @@
                                 <nop-label asp-for="SelectedStoreIds" />
                             </div>
                             <div class="col-md-9">
-                                <nop-select asp-for="SelectedStoreIds" asp-items="@Model.AvailableStores" asp-multiple="true" />
-                                <span asp-validation-for="SelectedStoreIds"></span>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <nop-select asp-for="SelectedStoreIds" asp-items="Model.AvailableStores" asp-multiple="true" />
+                                        <script>
+                                            $(document).ready(function () {
+                                                var storesIdsInput = $('#@Html.IdFor(model => model.SelectedStoreIds)').data('kendoMultiSelect');
+                                                storesIdsInput.setOptions({
+                                                    autoClose: false,
+                                                    filter: 'contains'
+                                                });
+
+                                                @if (!Model.AvailableStores.Any())
+                                                {
+                                                    <text>
+                                                        storesIdsInput.setOptions({
+                                                            enable: false,
+                                                            placeholder: 'No stores available'
+                                                        });
+                                                        storesIdsInput._placeholder();
+                                                        storesIdsInput._enable();
+                                                    </text>
+                                                }
+                                            });
+                                        </script>
+                                    </div>
+                                    <div class="col-md-8">
+                                        @await Component.InvokeAsync("MultistoreDisabledWarning")
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="form-group row">
+                        <div class="form-group row" id="pnlLoop">
                             <div class="col-md-3">
                                 <nop-label asp-for="Loop" />
                             </div>
@@ -112,7 +123,7 @@
                                 <span asp-validation-for="Loop"></span>
                             </div>
                         </div>
-                        <div class="form-group row">
+                        <div class="form-group row" id="pnlAutoPlay">
                             <div class="col-md-3">
                                 <nop-label asp-for="AutoPlay" />
                             </div>
@@ -121,7 +132,7 @@
                                 <span asp-validation-for="AutoPlay"></span>
                             </div>
                         </div>
-                        <div class="form-group row">
+                        <div class="form-group row" id="pnlMaxVideos">
                             <div class="col-md-3">
                                 <nop-label asp-for="MaxVideos" />
                             </div>
@@ -130,16 +141,16 @@
                                 <span asp-validation-for="MaxVideos"></span>
                             </div>
                         </div>
-                        <div class="form-group row">
+                        <div class="form-group row" id="pnlPlacement">
                             <div class="col-md-3">
                                 <nop-label asp-for="Placement" />
                             </div>
                             <div class="col-md-9">
-                                <nop-editor asp-for="Placement" />
+                                <nop-select asp-for="Placement" asp-items="@Model.AvailablePlacements" />
                                 <span asp-validation-for="Placement"></span>
                             </div>
                         </div>
-                        <div class="form-group row">
+                        <div class="form-group row" id="pnlPlayerPlacement">
                             <div class="col-md-3">
                                 <nop-label asp-for="PlayerPlacement" />
                             </div>
@@ -159,6 +170,7 @@
     $(document).ready(function () {
         $('#@Html.IdFor(model => model.ChannelId)').change(channelChangeHandler);
         $('#@Html.IdFor(model => model.PlaylistId)').change(playlistChangeHandler);
+        $('#@Html.IdFor(model => model.LayoutTypeId)').change(toggleLayoutType);
 
         var channelId = $('#@Html.IdFor(model => model.ChannelId)').val();
         if (!channelId) {
@@ -171,6 +183,8 @@
             $('#pnlVideo').hide();
             playlistChangeHandler();
         }
+
+        toggleLayoutType();
     });
 
     function channelChangeHandler() {
@@ -225,6 +239,31 @@
         }
         else {
             $('#pnlPlaylist').hide();
+        }
+    }
+
+    function toggleLayoutType() {
+        var storyblockId = '@((int)LayoutType.Storyblock)';
+        var floatingPlayerId = '@((int)LayoutType.FloatingPlayer)';
+        var gridId = '@((int)LayoutType.Grid)';
+        var carouselId = '@((int)LayoutType.Carousel)';
+        var heroUnitId = '@((int)LayoutType.HeroUnit)';
+
+        var selectedTypeId = $('#@Html.IdFor(model => model.LayoutTypeId)').val();
+        if (!selectedTypeId || selectedTypeId == storyblockId || selectedTypeId == floatingPlayerId || selectedTypeId == heroUnitId) {
+            $('#pnlVideo').showElement();
+            $('#pnlLoop').showElement();
+            $('#pnlMaxVideos').showElement();
+            $('#pnlAutoPlay').hideElement();
+            $('#pnlPlacement').hideElement();
+            $('#pnlPlayerPlacement').hideElement();
+        } else if (selectedTypeId == gridId || selectedTypeId == carouselId) {
+            $('#pnlVideo').hideElement();
+            $('#pnlLoop').hideElement();
+            $('#pnlMaxVideos').showElement();
+            $('#pnlAutoPlay').showElement();
+            $('#pnlPlacement').showElement();
+            $('#pnlPlayerPlacement').showElement();
         }
     }
 </script>

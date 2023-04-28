@@ -9,9 +9,7 @@ using Nop.Plugin.Widgets.Firework.Models;
 using Nop.Plugin.Widgets.Firework.Services;
 using Nop.Services;
 using Nop.Services.Localization;
-using Nop.Services.Stores;
-using Nop.Web.Areas.Admin.Factories;
-using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
+using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
 
 namespace Nop.Plugin.Widgets.Firework.Factories
@@ -25,9 +23,8 @@ namespace Nop.Plugin.Widgets.Firework.Factories
 
         private readonly FireworkService _fireworkService;
         private readonly FireworkWidgetService _fireworkWidgetService;
-        private readonly IBaseAdminModelFactory _baseAdminModelFactory;
         private readonly ILocalizationService _localizationService;
-        private readonly IStoreMappingService _storeMappingService;
+        private readonly IStoreMappingSupportedModelFactory _storeMappingSupportedModelFactory;
 
         #endregion
 
@@ -35,15 +32,13 @@ namespace Nop.Plugin.Widgets.Firework.Factories
 
         public FireworkModelFactory(FireworkService fireworkService,
             FireworkWidgetService fireworkWidgetService,
-            IBaseAdminModelFactory baseAdminModelFactory,
             ILocalizationService localizationService,
-            IStoreMappingService storeMappingService)
+            IStoreMappingSupportedModelFactory storeMappingSupportedModelFactory)
         {
             _fireworkService = fireworkService;
             _fireworkWidgetService = fireworkWidgetService;
-            _baseAdminModelFactory = baseAdminModelFactory;
             _localizationService = localizationService;
-            _storeMappingService = storeMappingService;
+            _storeMappingSupportedModelFactory = storeMappingSupportedModelFactory;
         }
 
         #endregion
@@ -70,25 +65,72 @@ namespace Nop.Plugin.Widgets.Firework.Factories
 
         #region Methods
 
+        public async Task<EmbedWidgetSearchModel> PrepareEmbedWidgetSearchModelAsync(EmbedWidgetSearchModel searchModel)
+        {
+            if (searchModel is null)
+                throw new ArgumentNullException(nameof(searchModel));
+
+            searchModel.SetGridPageSize();
+
+            return await Task.FromResult(searchModel);
+        }
+
+        public async Task<EmbedWidgetListModel> PrepareEmbedWidgetListModelAsync(EmbedWidgetSearchModel searchModel)
+        {
+            if (searchModel is null)
+                throw new ArgumentNullException(nameof(searchModel));
+
+            var embedWidgets = await _fireworkWidgetService.GetEmbedWidgetsAsync(widgetZoneId: searchModel.SearchWidgetZoneId,
+                activeOnly: false,
+                storeId: searchModel.SearchStoreId,
+                layoutType: searchModel.SearchLayoutTypeId == 0 ? null : (LayoutType)searchModel.SearchLayoutTypeId,
+                pageIndex: searchModel.Page - 1,
+                pageSize: searchModel.PageSize);
+
+            var model = await new EmbedWidgetListModel().PrepareToGridAsync(searchModel, embedWidgets, () =>
+            {
+                return embedWidgets.SelectAwait(async embedWidget => await PrepareEmbedWidgetModelAsync(null, embedWidget, true));
+            });
+
+            return model;
+        }
+
         public async Task<EmbedWidgetModel> PrepareEmbedWidgetModelAsync(EmbedWidgetModel model, FireworkEmbedWidget embedWidget, bool excludeProperties = false)
         {
             if (embedWidget is not null)
             {
-                model ??= embedWidget.ToModel<EmbedWidgetModel>();
-                model.Title = await _localizationService.GetLocalizedAsync(embedWidget, w => w.Title);
-                model.WidgetZoneValue = EmbedWidgetHelper.GetCustomWidgetZoneNameValues().FirstOrDefault(x => x.Value == embedWidget.WidgetZoneId)?.Name;
-                model.SelectedStoreIds = (await _storeMappingService.GetStoresIdsWithAccessAsync(embedWidget)).ToList();
-                if (!model.SelectedStoreIds.Any())
-                    model.SelectedStoreIds = new List<int> { 0 };
+                model ??= new()
+                {
+                    Id = embedWidget.Id,
+                    Active = embedWidget.Active,
+                    ChannelId = embedWidget.ChannelId,
+                    PlaylistId = embedWidget.PlaylistId,
+                    VideoId = embedWidget.VideoId,
+                    LayoutTypeId = embedWidget.LayoutTypeId,
+                    WidgetZoneId = embedWidget.WidgetZoneId,
+                    Title = embedWidget.Title,
+                    DisplayOrder = embedWidget.DisplayOrder,
+                    Loop = embedWidget.Loop,
+                    AutoPlay = embedWidget.AutoPlay,
+                    MaxVideos = embedWidget.MaxVideos,
+                    Placement = embedWidget.Placement,
+                    PlayerPlacement = embedWidget.PlayerPlacement,
+                    WidgetZoneValue = EmbedWidgetHelper.GetCustomWidgetZoneNameValues().FirstOrDefault(x => x.Value == embedWidget.WidgetZoneId)?.Name
+                };
             }
+
+            //prepare model stores
+            await _storeMappingSupportedModelFactory.PrepareModelStoresAsync(model, embedWidget, excludeProperties);
 
             if (!excludeProperties)
             {
-                await _baseAdminModelFactory.PrepareStoresAsync(model.AvailableStores);
                 model.AvailableLayoutTypes = (await LayoutType.HeroUnit.ToSelectListAsync(false)).ToList();
                 model.AvailableWidgetZones = EmbedWidgetHelper.GetCustomWidgetZoneSelectList();
                 await PreparePlayerPlacementsAsync(model.AvailablePlayerPlacements);
-
+                model.AvailablePlacements = new[] { "Top", "Middle", "Bottom" }
+                    .Select(placement => new SelectListItem(placement, placement))
+                    .ToList();
+                
                 model.AvailableChannels.Add(new SelectListItem(await _localizationService.GetResourceAsync("Admin.Common.Select"), string.Empty));
                 var (channels, _) = await _fireworkService.GetChannelsAsync();
                 foreach (var channel in channels)
@@ -118,36 +160,6 @@ namespace Nop.Plugin.Widgets.Firework.Factories
                 else
                     model.AvailableVideos.Add(new SelectListItem(await _localizationService.GetResourceAsync("Admin.Common.Select"), string.Empty));
             }
-
-            return model;
-        }
-
-        public async Task<EmbedWidgetSearchModel> PrepareEmbedWidgetSearchModelAsync(EmbedWidgetSearchModel searchModel)
-        {
-            if (searchModel is null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            searchModel.SetGridPageSize();
-
-            return await Task.FromResult(searchModel);
-        }
-
-        public async Task<EmbedWidgetListModel> PrepareEmbedWidgetListModelAsync(EmbedWidgetSearchModel searchModel)
-        {
-            if (searchModel is null)
-                throw new ArgumentNullException(nameof(searchModel));
-
-            var embedWidgets = await _fireworkWidgetService.GetEmbedWidgetsAsync(widgetZoneId: searchModel.SearchWidgetZoneId,
-                activeOnly: false,
-                storeId: searchModel.SearchStoreId,
-                layoutType: searchModel.SearchLayoutTypeId == 0 ? null : (LayoutType)searchModel.SearchLayoutTypeId,
-                pageIndex: searchModel.Page - 1,
-                pageSize: searchModel.PageSize);
-
-            var model = await new EmbedWidgetListModel().PrepareToGridAsync(searchModel, embedWidgets, () =>
-            {
-                return embedWidgets.SelectAwait(async embedWidget => await PrepareEmbedWidgetModelAsync(null, embedWidget, true));
-            });
 
             return model;
         }

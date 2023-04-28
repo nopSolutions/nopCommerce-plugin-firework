@@ -12,9 +12,10 @@
             case LayoutType.FloatingPlayer:
                 cdnUrl = $"//{FireworkDefaults.CdnUrl}/js/storyblock.js";
                 break;
-            case LayoutType.ChannelButton:
-                cdnUrl = $"//{FireworkDefaults.CdnUrl}/js/channel-button.js";
-                break;
+            //deprecated
+            //case LayoutType.ChannelButton:
+            //    cdnUrl = $"//{FireworkDefaults.CdnUrl}/js/channel-button.js";
+            //    break;
             case LayoutType.Grid:
             case LayoutType.Carousel:
                 cdnUrl = $"//{FireworkDefaults.CdnUrl}/js/embed-feed.js";
@@ -37,14 +38,15 @@
                 channel="@widget.ChannelId"
                 playlist="@widget.PlaylistId"
                 video="@widget.VideoId"
-                mode="@(widget.LayoutTypeId == (int)LayoutType.FloatingPlayer ? "pinned" : "row")"
-                autoplay="@widget.AutoPlay.ToString().ToLower()"
+                mode="@(widget.LayoutTypeId == (int)LayoutType.FloatingPlayer ? "pinned" : string.Empty)"
                 max_videos="@widget.MaxVideos"
                 loop="@widget.Loop.ToString().ToLower()"
+                autoplay="true"
                 dock="false">
             </fw-storyblock>
             break;
-            
+
+        @* deprecated
         case LayoutType.ChannelButton:
             <fw-channel-button
                 channel="@widget.ChannelId"
@@ -58,20 +60,20 @@
                 vertical="">
             </fw-channel-button>
             break;
+        *@
 
         case LayoutType.Grid:
         case LayoutType.Carousel:
             <fw-embed-feed
                 channel="@widget.ChannelId"
                 playlist="@widget.PlaylistId"
-                video="@widget.VideoId"
                 mode="@(widget.LayoutTypeId == (int)LayoutType.Grid ? "grid" : "row")"
                 size="large"
                 open_in="default"
                 max_videos="@widget.MaxVideos"
                 autoplay="@widget.AutoPlay.ToString().ToLower()"
-                placement="middle"
-                player_placement="@widget.PlayerPlacement"
+                placement="@widget.Placement.ToLower()"
+                player_placement="@widget.PlayerPlacement.ToLower()"
                 title="@widget.Title">
             </fw-embed-feed>
             break;
@@ -81,6 +83,11 @@
                 channel="@widget.ChannelId"
                 playlist="@widget.PlaylistId"
                 video="@widget.VideoId"
+                max_videos="@widget.MaxVideos"
+                loop="@widget.Loop.ToString().ToLower()"
+                mode=""
+                autoplay="true"
+                dock="false"
                 hero_text_mode="even"
                 hero_flip_order="false">
             </fw-herounit>

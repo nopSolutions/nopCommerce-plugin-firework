@@ -69,7 +69,7 @@ namespace Nop.Plugin.Widgets.Firework.Controllers
             if (!string.IsNullOrEmpty(error))
                 return BadRequest();
 
-            if (response is null || !response.Any())
+            if (response is null)
                 return NotFound();
 
             var data = response.Select(item => new { unitId = item.Id, quantity = item.Quantity, product = item.Product }).ToList();

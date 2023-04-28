@@ -16,6 +16,18 @@ namespace Nop.Plugin.Widgets.Firework.Domain.Api.Products
         }
 
         /// <summary>
+        /// Gets or sets the business identifier
+        /// </summary>
+        [JsonProperty("business_id")]
+        public string BusinessId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the business store identifier
+        /// </summary>
+        [JsonProperty("business_store_id")]
+        public string BusinessStoreId { get; set; }
+
+        /// <summary>
         /// Gets or sets the product identifier
         /// </summary>
         [JsonProperty("product_ext_id")]
@@ -38,12 +50,6 @@ namespace Nop.Plugin.Widgets.Firework.Domain.Api.Products
         /// </summary>
         [JsonProperty("business_store_name")]
         public string BusinessStoreName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the business store identifier
-        /// </summary>
-        [JsonProperty("business_store_id")]
-        public string BusinessStoreId { get; set; }
 
         /// <summary>
         /// Gets or sets the business store UID

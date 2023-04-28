@@ -67,8 +67,7 @@ namespace Nop.Plugin.Widgets.Firework.Services
             if (layoutType.HasValue)
                 query = query.Where(ew => ew.LayoutTypeId == (int)layoutType.Value);
 
-            if (storeId > 0)
-                query = await _storeMappingService.ApplyStoreMapping(query, storeId);
+            query = await _storeMappingService.ApplyStoreMapping(query, storeId);
 
             query = query.OrderBy(ew => ew.DisplayOrder).ThenBy(ew => ew.Id);
 
@@ -127,6 +126,7 @@ namespace Nop.Plugin.Widgets.Firework.Services
         public async Task UpdateEmbedWidgetStoreMappingsAsync(FireworkEmbedWidget embedWidget, IList<int> limitedToStoresIds)
         {
             embedWidget.LimitedToStores = limitedToStoresIds.Any();
+            await UpdateEmbedWidgetAsync(embedWidget);
 
             var existingStoreMappings = await _storeMappingService.GetStoreMappingsAsync(embedWidget);
             var allStores = await _storeService.GetAllStoresAsync();
