@@ -186,8 +186,8 @@ namespace Nop.Plugin.Widgets.Firework.Services
         private static string GetContentHash(string hmacSecret, string content)
         {
             var hmac = new HMACSHA512(Encoding.UTF8.GetBytes(hmacSecret.ToLower()));
-            var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(content));
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(BitConverter.ToString(hash).Replace("-", "").ToLower()));
+            var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(content.ToLower()));
+            return Convert.ToBase64String(hash).ToLower();
         }
 
         /// <summary>
