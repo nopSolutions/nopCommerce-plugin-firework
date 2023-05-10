@@ -185,8 +185,8 @@ namespace Nop.Plugin.Widgets.Firework.Services
         /// <returns>Hashed content</returns>
         private static string GetContentHash(string hmacSecret, string content)
         {
-            var hmac = new HMACSHA512(Encoding.UTF8.GetBytes(hmacSecret.ToLower()));
-            var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(content.ToLower()));
+            var hmac = new HMACSHA512(Encoding.UTF8.GetBytes(hmacSecret));
+            var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(content));
             return Convert.ToBase64String(hash).ToLower();
         }
 
@@ -462,7 +462,7 @@ namespace Nop.Plugin.Widgets.Firework.Services
             try
             {
                 var (hmacSecret, _) = await GetHmacSecretAsync();
-                var contentHash = GetContentHash(hmacSecret ?? string.Empty, content.ToLower());
+                var contentHash = GetContentHash(hmacSecret ?? string.Empty, content);
                 var validationMessage = $"{FireworkDefaults.SystemName} HMAC authorization details.{Environment.NewLine}";
                 validationMessage += $"Request type: '{httpRequest.Method}'{Environment.NewLine}";
                 validationMessage += $"Request URL (lowercased): '{content.ToLower()}'{Environment.NewLine}";
