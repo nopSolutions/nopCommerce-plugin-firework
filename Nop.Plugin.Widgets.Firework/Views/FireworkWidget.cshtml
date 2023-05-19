@@ -3,22 +3,22 @@
 @{
     var currency = await workContext.GetWorkingCurrencyAsync();
 
-    var cdnUrl = $"//{FireworkDefaults.CdnUrl}/js/fwn.js";
+    var cdnUrl = $"//{(fireworkSettings.UseSandbox ? FireworkDefaults.SandboxCdnUrl : FireworkDefaults.CdnUrl)}/js/fwn.js";
     if (Model.Count == 1 && Model.FirstOrDefault() is EmbedWidgetModel singleWidget)
     {
         switch ((LayoutType?)singleWidget.LayoutTypeId)
         {
             case LayoutType.Storyblock:
             case LayoutType.FloatingPlayer:
-                cdnUrl = $"//{FireworkDefaults.CdnUrl}/js/storyblock.js";
+                cdnUrl = $"//{(fireworkSettings.UseSandbox ? FireworkDefaults.SandboxCdnUrl : FireworkDefaults.CdnUrl)}/js/storyblock.js";
                 break;
             //deprecated
             //case LayoutType.ChannelButton:
-            //    cdnUrl = $"//{FireworkDefaults.CdnUrl}/js/channel-button.js";
+            //    cdnUrl = $"//{(fireworkSettings.UseSandbox ? FireworkDefaults.SandboxCdnUrl : FireworkDefaults.CdnUrl)}/js/channel-button.js";
             //    break;
             case LayoutType.Grid:
             case LayoutType.Carousel:
-                cdnUrl = $"//{FireworkDefaults.CdnUrl}/js/embed-feed.js";
+                cdnUrl = $"//{(fireworkSettings.UseSandbox ? FireworkDefaults.SandboxCdnUrl : FireworkDefaults.CdnUrl)}/js/embed-feed.js";
                 break;
             case LayoutType.HeroUnit:
                 break;

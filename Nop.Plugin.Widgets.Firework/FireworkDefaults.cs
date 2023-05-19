@@ -30,16 +30,19 @@ namespace Nop.Plugin.Widgets.Firework
         /// <summary>
         /// Gets the API URL
         /// </summary>
+        public static string SandboxApiUrl => "https://staging.fireworktv.com/";
         public static string ApiUrl => "https://fireworktv.com/";
 
         /// <summary>
         /// Gets the business portal iframe URL
         /// </summary>
+        public static string SandboxPortalUrl => "https://business-staging.fireworktv.com/integration";
         public static string PortalUrl => "https://business.firework.com/integration";
 
         /// <summary>
         /// Gets the script URL
         /// </summary>
+        public static string SandboxCdnUrl => "asset-staging.fwcdn1.com";
         public static string CdnUrl => "asset.fwcdn3.com";
 
         /// <summary>

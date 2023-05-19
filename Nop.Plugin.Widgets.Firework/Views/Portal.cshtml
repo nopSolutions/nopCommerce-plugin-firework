@@ -7,7 +7,7 @@
 }
 
 <iframe id="fw-iframe"
-        src="@FireworkDefaults.PortalUrl"
+        src="@(fireworkSettings.UseSandbox ? FireworkDefaults.SandboxPortalUrl : FireworkDefaults.PortalUrl)"
         style="width: 100%; height: 800px; border: none;"></iframe>
 
 <script>
@@ -20,7 +20,7 @@
             businessId: '@Model.BusinessId',
             locale: ''
         }
-        iframeWin.postMessage(message, '@FireworkDefaults.PortalUrl');
+        iframeWin.postMessage(message, '@(fireworkSettings.UseSandbox ? FireworkDefaults.SandboxPortalUrl : FireworkDefaults.PortalUrl)');
     }
     const handleMessage = (e) => {
         if (e.data === 'fwIntegrationReady') {

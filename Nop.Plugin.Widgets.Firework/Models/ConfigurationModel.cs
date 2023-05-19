@@ -27,6 +27,9 @@ namespace Nop.Plugin.Widgets.Firework.Models
         [NopResourceDisplayName("Plugins.Widgets.Firework.Configuration.Fields.Connected")]
         public bool Connected { get; set; }
 
+        [NopResourceDisplayName("Plugins.Widgets.Firework.Configuration.Fields.UseSandbox")]
+        public bool UseSandbox { get; set; }
+
         [NopResourceDisplayName("Plugins.Widgets.Firework.Configuration.Fields.Email")]
         public string Email { get; set; }
 

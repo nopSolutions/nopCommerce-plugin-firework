@@ -69,6 +69,7 @@ namespace Nop.Plugin.Widgets.Firework.Controllers
 
             var model = new ConfigurationModel
             {
+                UseSandbox = _fireworkSettings.UseSandbox,
                 Email = _fireworkSettings.Email,
                 ClientId = _fireworkSettings.ClientId,
                 ClientSecret = _fireworkSettings.ClientSecret,
@@ -119,6 +120,7 @@ namespace Nop.Plugin.Widgets.Firework.Controllers
             if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageWidgets))
                 return AccessDeniedView();
 
+            _fireworkSettings.UseSandbox = model.UseSandbox;
             _fireworkSettings.BusinessStoreId = model.BusinessStoreId;
 
             if (!FireworkService.IsConfigured(_fireworkSettings))

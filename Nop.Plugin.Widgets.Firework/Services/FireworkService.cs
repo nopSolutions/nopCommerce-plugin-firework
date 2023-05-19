@@ -187,7 +187,7 @@ namespace Nop.Plugin.Widgets.Firework.Services
         {
             var hmac = new HMACSHA512(Encoding.UTF8.GetBytes(hmacSecret));
             var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(content));
-            return Convert.ToBase64String(hash).ToLower();
+            return Convert.ToBase64String(hash);
         }
 
         /// <summary>
@@ -463,19 +463,6 @@ namespace Nop.Plugin.Widgets.Firework.Services
             {
                 var (hmacSecret, _) = await GetHmacSecretAsync();
                 var contentHash = GetContentHash(hmacSecret ?? string.Empty, content);
-                var validationMessage = $"{FireworkDefaults.SystemName} HMAC authorization details.{Environment.NewLine}";
-                validationMessage += $"Request type: '{httpRequest.Method}'{Environment.NewLine}";
-                validationMessage += $"Request URL (lowercased): '{content.ToLower()}'{Environment.NewLine}";
-                validationMessage += $"X-fw-timestamp header: '{timeValue}'{Environment.NewLine}";
-                validationMessage += $"Request time: '{requestTime.UtcDateTime.ToString("G", CultureInfo.InvariantCulture)}'{Environment.NewLine}";
-                validationMessage += $"Server time: '{DateTime.UtcNow.ToString("G", CultureInfo.InvariantCulture)}'{Environment.NewLine}";
-                validationMessage += $"HMAC secret (lowercased): '{hmacSecret.ToLower()}'{Environment.NewLine}";
-                validationMessage += $"X-fw-hmac-sha512 header: '{fwContentSignature}'{Environment.NewLine}";
-                validationMessage += $"Calculated signature (base64 encoded HMACSHA512 hash of the request URL): '{contentHash.ToLower()}'{Environment.NewLine}";
-                if (!string.Equals(contentHash, fwContentSignature, StringComparison.InvariantCultureIgnoreCase))
-                    validationMessage += "Request signature and calculated signature don't match, HMAC authorization failed.";
-                await _logger.InformationAsync(validationMessage);
-                return true;
                 return string.Equals(contentHash, fwContentSignature, StringComparison.InvariantCultureIgnoreCase);
             }
             catch
@@ -525,7 +512,7 @@ namespace Nop.Plugin.Widgets.Firework.Services
         /// </returns>
         public async Task<string> GetAuthorizationUrlAsync()
         {
-            var url = $"{FireworkDefaults.ApiUrl}oauth/authorize";
+            var url = $"{(_fireworkSettings.UseSandbox ? FireworkDefaults.SandboxApiUrl : FireworkDefaults.ApiUrl)}oauth/authorize";
 
             var parameters = new Dictionary<string, string>
             {
@@ -644,7 +631,7 @@ namespace Nop.Plugin.Widgets.Firework.Services
 
                 var content = JsonConvert.SerializeObject(request);
                 var (hmacSecret, _) = await GetHmacSecretAsync();
-                var contentHash = GetContentHash(hmacSecret ?? string.Empty, content.ToLower());
+                var contentHash = GetContentHash(hmacSecret ?? string.Empty, content);
                 request.ContentSignature = contentHash;
 
                 var response = await _fireworkHttpClient.RequestAsync<UpdateProductRequest, UpdateProductResponse>(request);
@@ -674,7 +661,7 @@ namespace Nop.Plugin.Widgets.Firework.Services
 
                 var content = JsonConvert.SerializeObject(request);
                 var (hmacSecret, _) = await GetHmacSecretAsync();
-                var contentHash = GetContentHash(hmacSecret ?? string.Empty, content.ToLower());
+                var contentHash = GetContentHash(hmacSecret ?? string.Empty, content);
                 request.ContentSignature = contentHash;
 
                 var response = await _fireworkHttpClient.RequestAsync<DeleteProductRequest, DeleteProductResponse>(request);

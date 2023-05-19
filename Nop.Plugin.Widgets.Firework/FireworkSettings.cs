@@ -9,6 +9,11 @@ namespace Nop.Plugin.Widgets.Firework
     public class FireworkSettings : ISettings
     {
         /// <summary>
+        /// Gets or sets a value indicating whether to use sandbox
+        /// </summary>
+        public bool UseSandbox { get; set; }
+
+        /// <summary>
         /// Gets or sets the merchant email
         /// </summary>
         public string Email { get; set; }

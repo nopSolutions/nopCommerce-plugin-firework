@@ -59,7 +59,8 @@ namespace Nop.Plugin.Widgets.Firework.Services
             var requestContent = new StringContent(requestString,
                 Encoding.UTF8,
                 request is IBodiedRequest ? MimeTypes.TextPlain : MimeTypes.ApplicationJson);
-            var requestMessage = new HttpRequestMessage(new HttpMethod(request.Method), new Uri(new Uri(FireworkDefaults.ApiUrl), request.Path))
+            var baseUrl = new Uri(_fireworkSettings.UseSandbox ? FireworkDefaults.SandboxApiUrl : FireworkDefaults.ApiUrl); 
+            var requestMessage = new HttpRequestMessage(new HttpMethod(request.Method), new Uri(baseUrl, request.Path))
             {
                 Content = requestContent
             };

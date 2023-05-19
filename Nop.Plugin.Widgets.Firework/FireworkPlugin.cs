@@ -155,6 +155,8 @@ namespace Nop.Plugin.Widgets.Firework
                 ["Plugins.Widgets.Firework.Configuration.Fields.Connected.Hint"] = "Whether the plugin is connected with the fireworks business or not.",
                 ["Plugins.Widgets.Firework.Configuration.Fields.Email"] = "Email",
                 ["Plugins.Widgets.Firework.Configuration.Fields.Email.Hint"] = "Enter your email to get access to Firework services.",
+                ["Plugins.Widgets.Firework.Configuration.Fields.UseSandbox"] = "Use staging",
+                ["Plugins.Widgets.Firework.Configuration.Fields.UseSandbox.Hint"] = "Whether to use staging environment.",
 
                 ["Plugins.Widgets.Firework.EmbedWidget"] = "Embed widget",
                 ["Plugins.Widgets.Firework.EmbedWidget.Added"] = "The widget has been added successfully",
