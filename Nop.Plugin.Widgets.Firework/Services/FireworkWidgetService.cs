@@ -118,6 +118,15 @@ namespace Nop.Plugin.Widgets.Firework.Services
         }
 
         /// <summary>
+        /// Clear embed widgets
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation</returns>
+        public async Task ClearEmbedWidgetsAsync()
+        {
+            await _embedWidgetRepository.TruncateAsync();
+        }
+
+        /// <summary>
         /// Update embed widget store mappings
         /// </summary>
         /// <param name="embedWidget">Entity to update store mappings for</param>

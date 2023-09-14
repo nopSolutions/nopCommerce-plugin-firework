@@ -16,7 +16,11 @@ namespace Nop.Plugin.Widgets.Firework.Validators
         {
             RuleFor(model => model.ChannelId)
                 .NotEmpty()
-                .WithMessageAwait(localizationService.GetResourceAsync("Plugins.Widgets.Firework.EmbedWidget.Fields.ChannelId.Required"));
+                .WithMessageAwait(localizationService.GetResourceAsync("Plugins.Widgets.Firework.EmbedWidget.Fields.Channel.Required"));
+
+            RuleFor(model => model.PlaylistId)
+                .NotEmpty()
+                .WithMessageAwait(localizationService.GetResourceAsync("Plugins.Widgets.Firework.EmbedWidget.Fields.Playlist.Required"));
         }
 
         #endregion

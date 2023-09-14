@@ -36,5 +36,11 @@ namespace Nop.Plugin.Widgets.Firework.Domain.Api.Business
         /// </summary>
         [JsonProperty("url")]
         public string Url { get; set; }
+
+        /// <summary>
+        /// Gets or sets the video type
+        /// </summary>
+        [JsonProperty("video_type")]
+        public string VideoType { get; set; }
     }
 }

@@ -13,6 +13,7 @@ using Nop.Services.Messages;
 using Nop.Services.Security;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
+using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
 
 namespace Nop.Plugin.Widgets.Firework.Controllers
@@ -177,13 +178,18 @@ namespace Nop.Plugin.Widgets.Firework.Controllers
             _fireworkSettings.Email = string.Empty;
             _fireworkSettings.ClientId = string.Empty;
             _fireworkSettings.ClientSecret = string.Empty;
+            _fireworkSettings.OAuthAppId = string.Empty;
             _fireworkSettings.RefreshToken = string.Empty;
             _fireworkSettings.AccessToken = string.Empty;
+            _fireworkSettings.TokenExpiresIn = null;
+            _fireworkSettings.RefreshTokenExpiresIn = null;
             _fireworkSettings.BusinessId = string.Empty;
             _fireworkSettings.BusinessStoreId = string.Empty;
             _fireworkSettings.HmacSecret = string.Empty;
 
             await _settingService.SaveSettingAsync(_fireworkSettings);
+
+            await _fireworkWidgetService.ClearEmbedWidgetsAsync();
 
             return RedirectToAction(nameof(Configure));
         }
@@ -193,12 +199,25 @@ namespace Nop.Plugin.Widgets.Firework.Controllers
             if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageWidgets))
                 return AccessDeniedView();
 
-            var (result, errorMessage) = await _fireworkService.HandleOauthCallbackAsync(Request);
-
+            var (result, _) = await _fireworkService.HandleOauthCallbackAsync(Request);
             ViewBag.RefreshPage = result;
 
-            if (!string.IsNullOrEmpty(errorMessage))
-                _notificationService.ErrorNotification(errorMessage, false);
+            //select default store
+            if (result && !string.IsNullOrEmpty(_fireworkSettings.BusinessId))
+            {
+                var ((_, selectedStoreId), _) = await _fireworkService.GetBusinessStoresAsync();
+                if (selectedStoreId != _fireworkSettings.BusinessStoreId)
+                {
+                    _fireworkSettings.BusinessStoreId = selectedStoreId;
+                    await _settingService.SaveSettingAsync(_fireworkSettings);
+                }
+
+                if (!string.IsNullOrEmpty(_fireworkSettings.BusinessStoreId))
+                {
+                    //ensure HMAC is created and stored
+                    await _fireworkService.GetHmacSecretAsync(_fireworkSettings);
+                }
+            }
 
             return View("~/Plugins/Widgets.Firework/Views/OauthCallback.cshtml");
         }
@@ -238,7 +257,7 @@ namespace Nop.Plugin.Widgets.Firework.Controllers
             return Json(playlists.Select(playlist => new { playlist.Id, playlist.Name }));
         }
 
-        public async Task<IActionResult> Videos(string channelId, string playlistId)
+        public async Task<IActionResult> Videos(string channelId, string playlistId, int layoutTypeId)
         {
             if (string.IsNullOrEmpty(channelId))
                 return BadRequest("Channel ID is empty");
@@ -248,12 +267,18 @@ namespace Nop.Plugin.Widgets.Firework.Controllers
 
             var (videos, _) = await _fireworkService.GetVideosAsync(channelId, playlistId);
 
+            if (layoutTypeId == (int)LayoutType.HeroUnit)
+                videos = videos.Where(video => string.Equals(video.VideoType, "live_stream", StringComparison.InvariantCultureIgnoreCase)).ToList();
+
             return Json(videos.Select(video => new { video.EncodedId, video.Caption }));
         }
 
         [HttpPost]
         public async Task<IActionResult> ListEmbedWidget(EmbedWidgetSearchModel searchModel)
         {
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageWidgets))
+                return await AccessDeniedDataTablesJson();
+
             var model = await _fireworkModelFactory.PrepareEmbedWidgetListModelAsync(searchModel);
 
             return Json(model);
@@ -261,6 +286,9 @@ namespace Nop.Plugin.Widgets.Firework.Controllers
 
         public async Task<IActionResult> CreateEmbedWidget()
         {
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageWidgets))
+                return AccessDeniedView();
+
             var model = await _fireworkModelFactory.PrepareEmbedWidgetModelAsync(new(), null);
             model.Active = true;
 
@@ -271,6 +299,9 @@ namespace Nop.Plugin.Widgets.Firework.Controllers
         [ParameterBasedOnFormName("save-continue", "continueEditing")]
         public async Task<IActionResult> CreateEmbedWidget(EmbedWidgetModel model, bool continueEditing)
         {
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageWidgets))
+                return AccessDeniedView();
+
             if (ModelState.IsValid)
             {
                 var embedWidget = new FireworkEmbedWidget
@@ -307,6 +338,9 @@ namespace Nop.Plugin.Widgets.Firework.Controllers
 
         public async Task<IActionResult> EditEmbedWidget(int id)
         {
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageWidgets))
+                return AccessDeniedView();
+
             var embedWidget = await _fireworkWidgetService.GetEmbedWidgetByIdAsync(id);
             if (embedWidget is null)
                 return RedirectToAction(nameof(Configure));
@@ -320,6 +354,9 @@ namespace Nop.Plugin.Widgets.Firework.Controllers
         [ParameterBasedOnFormName("save-continue", "continueEditing")]
         public async Task<IActionResult> EditEmbedWidget(EmbedWidgetModel model, bool continueEditing)
         {
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageWidgets))
+                return AccessDeniedView();
+
             var embedWidget = await _fireworkWidgetService.GetEmbedWidgetByIdAsync(model.Id);
             if (embedWidget is null)
                 return RedirectToAction(nameof(Configure));
@@ -358,6 +395,23 @@ namespace Nop.Plugin.Widgets.Firework.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteEmbedWidget(int id)
         {
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageWidgets))
+                return await AccessDeniedDataTablesJson();
+
+            var embedWidget = await _fireworkWidgetService.GetEmbedWidgetByIdAsync(id)
+                ?? throw new ArgumentException("No widget found with the specified id", nameof(id));
+
+            await _fireworkWidgetService.DeleteEmbedWidgetAsync(embedWidget);
+
+            return new NullJsonResult();
+        }
+
+        [HttpPost]
+        public virtual async Task<IActionResult> Delete(int id)
+        {
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageWidgets))
+                return AccessDeniedView();
+
             var embedWidget = await _fireworkWidgetService.GetEmbedWidgetByIdAsync(id);
             if (embedWidget is null)
                 return RedirectToAction(nameof(Configure));

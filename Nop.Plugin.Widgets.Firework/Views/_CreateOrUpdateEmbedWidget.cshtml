@@ -29,7 +29,7 @@
                                 <nop-label asp-for="PlaylistId" />
                             </div>
                             <div class="col-md-9">
-                                <nop-select asp-for="PlaylistId" asp-items="@Model.AvailablePlaylists" />
+                                <nop-select asp-for="PlaylistId" asp-items="@Model.AvailablePlaylists" asp-required="true" />
                                 <span asp-validation-for="PlaylistId"></span>
                             </div>
                         </div>
@@ -217,12 +217,14 @@
     function playlistChangeHandler() {
         var channelId = $('#@Html.IdFor(model => model.ChannelId)').val();
         var playlistId = $('#@Html.IdFor(model => model.PlaylistId)').val();
+        var layoutTypeId = $('#@Html.IdFor(model => model.LayoutTypeId)').val();
         if (channelId && playlistId) {
             $.ajax({
                 url: '@Url.Action("Videos", "Firework")',
                 data: {
                     channelId: channelId,
-                    playlistId: playlistId
+                    playlistId: playlistId,
+                    layoutTypeId: layoutTypeId
                 },
                 success: function (data) {
                     var list = $('#@Html.IdFor(model => model.VideoId)');
@@ -238,7 +240,7 @@
             });
         }
         else {
-            $('#pnlPlaylist').hide();
+            $('#pnlVideo').hide();
         }
     }
 

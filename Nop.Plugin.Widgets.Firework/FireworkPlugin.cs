@@ -170,7 +170,7 @@ namespace Nop.Plugin.Widgets.Firework
                 ["Plugins.Widgets.Firework.EmbedWidget.Fields.AutoPlay.Hint"] = "Enable autoplay",
                 ["Plugins.Widgets.Firework.EmbedWidget.Fields.Channel"] = "Channel ID",
                 ["Plugins.Widgets.Firework.EmbedWidget.Fields.Channel.Hint"] = "Firework channel ID to use",
-                ["Plugins.Widgets.Firework.EmbedWidget.Fields.ChannelId.Required"] = "Channel ID is required",
+                ["Plugins.Widgets.Firework.EmbedWidget.Fields.Channel.Required"] = "Channel ID is required",
                 ["Plugins.Widgets.Firework.EmbedWidget.Fields.CreatedOn"] = "Created on",
                 ["Plugins.Widgets.Firework.EmbedWidget.Fields.CreatedOn.Hint"] = "Created on",
                 ["Plugins.Widgets.Firework.EmbedWidget.Fields.DisplayOrder"] = "Display order",
@@ -187,6 +187,7 @@ namespace Nop.Plugin.Widgets.Firework
                 ["Plugins.Widgets.Firework.EmbedWidget.Fields.PlayerPlacement.Hint"] = "Position of the player",
                 ["Plugins.Widgets.Firework.EmbedWidget.Fields.Playlist"] = "Playlist ID",
                 ["Plugins.Widgets.Firework.EmbedWidget.Fields.Playlist.Hint"] = "Firework playlist ID to use",
+                ["Plugins.Widgets.Firework.EmbedWidget.Fields.Playlist.Required"] = "Playlist ID is required",
                 ["Plugins.Widgets.Firework.EmbedWidget.Fields.SelectedStoreIds"] = "Stores",
                 ["Plugins.Widgets.Firework.EmbedWidget.Fields.SelectedStoreIds.Hint"] = "The stores the widget will be shown",
                 ["Plugins.Widgets.Firework.EmbedWidget.Fields.Title"] = "Title",
@@ -213,7 +214,7 @@ namespace Nop.Plugin.Widgets.Firework
 
                 ["Plugins.Widgets.Firework.OAuth"] = "Credentials",
                 ["Plugins.Widgets.Firework.OAuth.Button"] = "Connect Firework",
-                ["Plugins.Widgets.Firework.OAuth.ButtonReset"] = "Reset Business",
+                ["Plugins.Widgets.Firework.OAuth.ButtonReset"] = "Reset credentials",
                 ["Plugins.Widgets.Firework.OAuth.Connected"] = "Connected",
                 ["Plugins.Widgets.Firework.OAuth.Disconnected"] = "Disconnected",
 

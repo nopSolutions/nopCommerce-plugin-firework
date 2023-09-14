@@ -130,7 +130,7 @@ namespace Nop.Plugin.Widgets.Firework.Factories
                 model.AvailablePlacements = new[] { "Top", "Middle", "Bottom" }
                     .Select(placement => new SelectListItem(placement, placement))
                     .ToList();
-                
+
                 model.AvailableChannels.Add(new SelectListItem(await _localizationService.GetResourceAsync("Admin.Common.Select"), string.Empty));
                 var (channels, _) = await _fireworkService.GetChannelsAsync();
                 foreach (var channel in channels)
@@ -152,6 +152,10 @@ namespace Nop.Plugin.Widgets.Firework.Factories
                 if (!string.IsNullOrEmpty(model.ChannelId) && !string.IsNullOrEmpty(model.PlaylistId))
                 {
                     var (videos, _) = await _fireworkService.GetVideosAsync(model.ChannelId, model.PlaylistId);
+
+                    if (model.LayoutTypeId == (int)LayoutType.HeroUnit)
+                        videos = videos.Where(video => string.Equals(video.VideoType, "live_stream", StringComparison.InvariantCultureIgnoreCase)).ToList();
+
                     foreach (var video in videos)
                     {
                         model.AvailableVideos.Add(new SelectListItem($"{video.Caption} ({video.EncodedId})", video.EncodedId));
